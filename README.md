@@ -1,73 +1,78 @@
-# Simple-SMTP-Mail-Scheduler
+# Woo Coupon Generator
 
-**Simple SMTP Mail Scheduler** is a WordPress plugin that allows you to queue and send emails using custom SMTP profiles. It intercepts `wp_mail` calls, stores emails in a database, and sends them asynchronously via a cron job, ensuring reliable email delivery with configurable SMTP settings.
+**Version:** 1.0.0  
+**Requires WordPress:** 5.6+  
+**Tested up to:** 6.8  
+**Requires PHP:** 7.4+  
+**Requires Plugins:** WooCommerce, FluentCRM or MailPoet  
+**License:** GPL-3.0-or-later  
+
+Generate unique, one-time WooCommerce coupons dynamically inside your email campaigns.  
+Supports **FluentCRM Smartcodes** and **MailPoet custom shortcodes**, so each contact or subscriber receives a personalized coupon code.
+
+---
 
 ## Features
 
-- **Email Queuing**: Replaces `wp_mail` to queue emails for scheduled sending.
-- **SMTP Profiles**: Configure multiple SMTP profiles with settings like host, port, and authentication.
-- **Profile Snapshots**: Stores a snapshot of SMTP settings for each email to prevent issues from profile changes or deletions.
-- **Priority and Scheduling**: Assign priorities to emails and schedule them for specific times.
-- **Testing Mode**: Log emails without sending them for testing purposes.
-- **Admin Log Interface**: View queued, sent, and failed emails with details like recipient, subject, profile, and status.
-- **Retry Mechanism**: Automatically retries failed emails up to a configurable limit.
-- **Clean Logging**: Limits the number of stored email logs to prevent database bloat.
+- **Automatic WooCommerce coupon generation**
+  - Creates a new coupon cloned from an existing “template” coupon.
+- **Email integration**
+  - Works seamlessly inside **FluentCRM** emails and **MailPoet** newsletters.
+- **Smartcode & shortcode syntax**
+  - FluentCRM: `{{generate_coupon:BASECOUPON}}`
+  - MailPoet: `[custom:coupon_BASECOUPON]`
+- **Per-contact tracking**
+  - Each subscriber receives a unique coupon stored in their profile meta.
+- **Reuses existing coupons**
+  - If a coupon was already generated for a subscriber, it reuses it instead of creating duplicates.
 
-## Installation
-
-1. **Download the Plugin**:
-   - Clone the repository or download the ZIP file:
-     ```bash
-     git clone https://github.com/your-username/smtp-mail-scheduler.git
-     ```
-   - Or upload the plugin folder to `wp-content/plugins/smtp-mail-scheduler/`.
-
-2. **Activate the Plugin**:
-   - In the WordPress admin dashboard, go to **Plugins** > **Installed Plugins**.
-   - Find **SMTP Mail Scheduler** and click **Activate**.
-
-3. **Configure SMTP Profiles**:
-   - Navigate to the plugin’s settings page in the WordPress admin (e.g., **Settings > SMTP Mail Scheduler**).
-   - Add one or more SMTP profiles with details like host, port, username, password, and encryption.
-   - Set an active profile for sending emails.
+---
 
 ## Usage
 
-1. **Queue Emails**:
-   - Use WordPress’s `wp_mail` function as usual. The plugin will intercept and queue emails using the active SMTP profile.
-   - Example:
-     ```php
-     wp_mail('recipient@example.com', 'Test Subject', 'Test Message');
-     ```
+### FluentCRM
 
-2. **View Email Logs**:
-   - Go to the plugin’s log page in the WordPress admin to view queued, processing, sent, or failed emails.
-   - Use actions to retry failed emails, remove emails, or prioritize queued emails.
+Insert this Smartcode into any email body:
 
-3. **Manage SMTP Profiles**:
-   - Add, edit, or delete SMTP profiles in the plugin settings.
-   - Each queued email stores a snapshot of the profile settings to ensure consistent sending even if profiles change.
+{{generate_coupon:WELCOME10}}
 
-4. **Testing Mode**:
-   - Enable testing mode in the settings to log emails without sending them.
-   - Check the logs to verify email content and settings.
 
-## Requirements
+Where `WELCOME10` is the **base WooCommerce coupon** you’ve already created.
 
-- WordPress 5.0 or higher
-- PHP 7.4 or higher
-- MySQL 5.7 or higher (for JSON support in `profile_settings`)
+When FluentCRM sends the email:
+1. The plugin finds the base coupon.
+2. It clones it into a new unique coupon code.
+3. Stores that new code under the subscriber’s record.
+4. Inserts the code into the outgoing email.
 
-## Development
+---
 
-- **Repository**: [https://github.com/your-username/smtp-mail-scheduler](https://github.com/your-username/smtp-mail-scheduler)
-- **Contributing**: Fork the repository, make changes, and submit a pull request.
-- **Issues**: Report bugs or suggest features via the GitHub Issues page.
+### MailPoet
+
+Insert this shortcode into your MailPoet email:
+
+[custom:coupon_WELCOME10]
+
+
+When MailPoet sends the newsletter:
+1. The plugin intercepts the shortcode.
+2. Clones the WooCommerce coupon named `WELCOME10`.
+3. Generates a unique coupon for each subscriber.
+4. Inserts it dynamically.
+
+---
+
+## Installation
+
+1. **Upload the plugin:**
+   - Copy the entire `woo-coupon-generator` folder into `/wp-content/plugins/`.
+2. **Activate it** via the WordPress **Plugins** screen.
+3. Make sure you have **WooCommerce**, **FluentCRM**, and/or **MailPoet** active.
+4. Create a base coupon in WooCommerce (e.g., `WELCOME10`).
+5. Use the Smartcode or shortcode in your email templates.
+
+---
 
 ## License
 
-This plugin is licensed under the [GPLv3 or later](https://www.gnu.org/licenses/gpl-3.0.html).
-
-## Credits
-
-Developed by [Your Name or Organization]. Inspired by the need for reliable, scheduled email delivery in WordPress.
+This plugin is open-source software licensed under the [GPL-3.0-or-later](https://www.gnu.org/licenses/gpl-3.0.html).
