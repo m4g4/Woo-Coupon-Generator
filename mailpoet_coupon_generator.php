@@ -117,6 +117,10 @@ if ( ! class_exists( 'Mailpoet_Coupon_Generator' ) ) {
         return $AR_MAILPOET_COUPON_CUSTOM_SHORTCODE_PREFIX;
     }
 
+    function ar_is_mailpoet_active() {
+        return is_plugin_active('mailpoet/mailpoet.php');
+    }
+
     new Mailpoet_Coupon_Generator();
 }
 ?>

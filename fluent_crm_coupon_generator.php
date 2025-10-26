@@ -180,5 +180,9 @@ if (!class_exists('FluentCRM_Coupon_Generator')) {
         return $AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_KEY.'.'.$AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_PREFIX;
     }
 
+    function ar_is_fluentcrm_active() {
+        return is_plugin_active('fluent-crm/fluent-crm.php');
+    }
+
     new FluentCRM_Coupon_Generator($AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_KEY, $AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_PREFIX);
 }

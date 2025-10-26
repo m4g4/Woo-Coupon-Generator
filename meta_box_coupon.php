@@ -14,12 +14,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<input type="checkbox" name="<?php echo $AR_ONE_TIME_COUPON_ENABLED; ?>" id="<?php echo $AR_ONE_TIME_COUPON_ENABLED; ?>" value="true" <?php echo $one_time_coupon_enabled; ?> /><br /><br />
 	
     <div id="ar_coupon_panel_options" style="display: none;">
-        Mailpoet Shortcode:<br />
-	    <input type="text" id="ar_coupon_shortcode" value="[<?php echo ar_mailpoet_coupon_gen_smart_code()?><?php echo $post_title?>]" disabled/> <button type="button" id="ar_coupon_copy_to_clipboard"><i class="fa fa-copy" title="Copy to clipboard"></i></button><br /><br />
-
-        FluentCRM Smartcode:<br />
-	    <input type="text" id="ar_coupon_shortcode" value="{{<?php echo ar_fluentcrm_coupon_gen_smart_code()?>:<?php echo $post_title?>}}" disabled/> <button type="button" id="ar_coupon_copy_to_clipboard"><i class="fa fa-copy" title="Copy to clipboard"></i></button><br /><br />
-
+        <?php if (ar_is_mailpoet_active()) { ?>
+            Mailpoet Shortcode:<br />
+	        <input type="text" id="ar_coupon_shortcode" value="[<?php echo ar_mailpoet_coupon_gen_smart_code()?><?php echo $post_title?>]" disabled/> <button type="button" id="ar_coupon_copy_to_clipboard"><i class="fa fa-copy" title="Copy to clipboard"></i></button><br /><br />
+        <?php }?>
+        <?php if (ar_is_fluentcrm_active()) { ?>
+            FluentCRM Smartcode:<br />
+	        <input type="text" id="ar_coupon_shortcode" value="{{<?php echo ar_fluentcrm_coupon_gen_smart_code()?>:<?php echo $post_title?>}}" disabled/> <button type="button" id="ar_coupon_copy_to_clipboard"><i class="fa fa-copy" title="Copy to clipboard"></i></button><br /><br />
+        <?php }?>
         New coupon prefix:<br />
 	    <input type="text" name="<?php echo $AR_ONE_TIME_COUPON_PREFIX; ?>" id="<?php echo $AR_ONE_TIME_COUPON_PREFIX; ?>" value="<?php echo $one_time_coupon_prefix; ?>"/><br /><br />
         Example: <span id="ar_coupon_example"></span><br />

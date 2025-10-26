@@ -12,7 +12,6 @@
  * Requires PHP: 7.4
  */
 
-
 require_once __DIR__ . '/fluent_crm_coupon_generator.php';
 require_once __DIR__ . '/mailpoet_coupon_generator.php';
 require_once __DIR__ . '/settings.php';
