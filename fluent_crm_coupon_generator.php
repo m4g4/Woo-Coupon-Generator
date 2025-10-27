@@ -10,7 +10,6 @@ if (!defined('ABSPATH')) {
  * Smartcode: {{generate_coupon:BASECOUPON}}
  * Generates a WooCommerce coupon for each FluentCRM contact.
  */
-
 if (!class_exists('FluentCRM_Coupon_Generator')) {
 
     $AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_KEY = 'ar';
@@ -20,7 +19,6 @@ if (!class_exists('FluentCRM_Coupon_Generator')) {
     {
         private $shortcode_key;
         private $shortcode_prefix;
-
         private $coupon_code_placeholder = 'COUPON_CODE_HERE';
         private $extender;
 
@@ -47,13 +45,11 @@ if (!class_exists('FluentCRM_Coupon_Generator')) {
             }
         }
 
-        public function handle_coupon_smartcode($code, $subscriber)
+        public function handle_coupon_smartcode($code, $valueKey, $defaultValue, $subscriber)
         {
-            // Clean the code by removing {{ and }} delimiters
-            $clean_code = trim($code, '{}');
-            $parts = explode(':', $clean_code);
+            $parts = explode(':', $valueKey);
 
-            $is_preview = $this->is_email_preview($subscriber);
+            $is_preview = $this->is_email_preview();
 
             if (count($parts) < 2) {
                 if ($is_preview) {
@@ -79,6 +75,8 @@ if (!class_exists('FluentCRM_Coupon_Generator')) {
 
         private function get_or_create_coupon($base_coupon, $subscriber, $is_preview)
         {
+            global $AR_ONE_TIME_COUPON_PREFIX;
+
             if (!$is_preview) {
                 $existing = fluentcrm_get_subscriber_meta($subscriber->id, 'coupon_' . $base_coupon);
                 if ($existing) {
@@ -95,8 +93,12 @@ if (!class_exists('FluentCRM_Coupon_Generator')) {
                 return '';
             }
 
-            $prefix = get_post_meta($orig_id, '_coupon_prefix', true) ?: 'coupon_';
+            $prefix = get_post_meta($orig_id, ar_key($AR_ONE_TIME_COUPON_PREFIX), true) ?: 'coupon_';
             $new_code = $this->create_coupon_name($prefix);
+
+            if ($is_preview) {
+                return 'PREVIEW_COUPON';
+            }
 
             $post = [
                 'post_title'   => $new_code,
@@ -151,31 +153,15 @@ if (!class_exists('FluentCRM_Coupon_Generator')) {
             }
         }
 
-        private function is_email_preview($subscriber)
+        private function is_email_preview()
         {
-            // Check if subscriber is invalid or a test subscriber
-            if (!$subscriber || !isset($subscriber->id) || !isset($subscriber->email) || empty($subscriber->email)) {
-                error_log('FluentCRM_Coupon_Generator: Invalid or missing subscriber data, assuming preview.');
-                return true;
-            }
-
-            // Check if this is an AJAX request (common for previews)
-            if (defined('DOING_AJAX') && DOING_AJAX) {
-                error_log('FluentCRM_Coupon_Generator: AJAX request detected, assuming preview.');
-                return true;
-            }
-
-            // Optional: Check query vars or context (customize based on FluentCRM behavior)
-            if (isset($_GET['fluentcrm_preview']) || isset($_GET['preview'])) {
-                error_log('FluentCRM_Coupon_Generator: Preview query var detected.');
-                return true;
-            }
-
-            return false;
+            // This is only experimental and can be changed in the future
+            $campaign = isset($_REQUEST['campaign']) ? (object) $_REQUEST['campaign'] : null;
+            return $campaign ? true : false;
         }
     }
 
-    function ar_fluentcrm_coupon_gen_smart_code() {
+    function ar_fluentcrm_coupon_gen_smartcode() {
         global $AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_KEY, $AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_PREFIX;
         return $AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_KEY.'.'.$AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_PREFIX;
     }

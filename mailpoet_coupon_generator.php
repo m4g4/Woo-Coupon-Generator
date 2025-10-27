@@ -112,7 +112,7 @@ if ( ! class_exists( 'Mailpoet_Coupon_Generator' ) ) {
         }
     }
 
-    function ar_mailpoet_coupon_gen_smart_code() {
+    function ar_mailpoet_coupon_gen_shortcode() {
         global $AR_MAILPOET_COUPON_CUSTOM_SHORTCODE_PREFIX;
         return $AR_MAILPOET_COUPON_CUSTOM_SHORTCODE_PREFIX;
     }

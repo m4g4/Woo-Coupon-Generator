@@ -14,10 +14,30 @@ if ( ! class_exists( 'WooCommerce_Coupon_Generator_Settings' ) ) {
 		public function __construct() {
             add_action('save_post', array($this, 'save_postdata'));
             add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
+            add_action('admin_enqueue_scripts', [$this, 'enqueue_scripts']);
         }
 
         public function add_meta_boxes() {
             add_meta_box('ar_meta_coupon_box', 'One time coupons', array($this, 'ar_add_meta_coupon_box'), 'shop_coupon', 'side', 'high');
+        }
+
+        public function enqueue_scripts() {
+            global $AR_ONE_TIME_COUPON_ENABLED, $AR_ONE_TIME_COUPON_PREFIX;
+
+            wp_enqueue_script(
+                'woo-coupon-gen-admin',
+                plugins_url('/assets/js/admin_scripts.js', __FILE__),
+                ['jquery'],
+                '0.1.0',
+                true
+            );
+
+            wp_localize_script('woo-coupon-gen-admin', 'woo_copoun_generator', [
+                'coupon_enabled_id' => $AR_ONE_TIME_COUPON_ENABLED,
+                'coupon_prefix_id' => $AR_ONE_TIME_COUPON_PREFIX,
+                'mailpoet_shortcode' => ar_mailpoet_coupon_gen_shortcode(),
+                'fluentcrm_smartcode' => ar_fluentcrm_coupon_gen_smartcode(),
+            ]);
         }
 
         public function ar_add_meta_coupon_box()
