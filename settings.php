@@ -21,8 +21,14 @@ if ( ! class_exists( 'WooCommerce_Coupon_Generator_Settings' ) ) {
             add_meta_box('ar_meta_coupon_box', 'One time coupons', array($this, 'ar_add_meta_coupon_box'), 'shop_coupon', 'side', 'high');
         }
 
-        public function enqueue_scripts() {
+        public function enqueue_scripts($hook) {
             global $AR_ONE_TIME_COUPON_ENABLED, $AR_ONE_TIME_COUPON_PREFIX;
+
+            global $post;
+
+            if (($hook !== 'post.php' && $hook !== 'post-new.php') || !$post || $post->post_type !== 'shop_coupon') {
+                return;
+            }
 
             wp_enqueue_script(
                 'woo-coupon-gen-admin',
