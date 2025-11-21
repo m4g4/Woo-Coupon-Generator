@@ -18,9 +18,9 @@ if ( ! class_exists( 'Mailpoet_Coupon_Generator' ) ) {
         }
 
         public function ww_mailpoet_custom_coupon_shortcode($shortcode, $newsletter, $subscriber, $queue, $newsletter_body, $arguments) {
-            global $AR_COUPON_CUSTOM_SHORTCODE_PREFIX, $AR_COUPON_GEN_PREFIX_OPTION, $AR_ONE_TIME_COUPON_PREFIX;
+            global $AR_MAILPOET_COUPON_CUSTOM_SHORTCODE_PREFIX, $AR_COUPON_GEN_PREFIX_OPTION, $AR_ONE_TIME_COUPON_PREFIX;
 
-            $pattern = '/\['.$AR_COUPON_CUSTOM_SHORTCODE_PREFIX.'([^\]]+)\]/';
+            $pattern = '/\['.$AR_MAILPOET_COUPON_CUSTOM_SHORTCODE_PREFIX.'([^\]]+)\]/';
 
             if (!preg_match($pattern, $shortcode, $matches)) {
                 return $shortcode;

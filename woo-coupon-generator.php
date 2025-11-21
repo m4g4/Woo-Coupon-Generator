@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Woo Coupon Generator
- * Description: Dynamically generates unique WooCommerce coupons for email marketing tools. Supports FluentCRM Smartcodes ({{generate_coupon:BASECOUPON}}) and MailPoet custom shortcodes ([custom:coupon_BASECOUPON]).
- * Version:     0.1.0
+ * Description: Dynamically generates unique WooCommerce coupons for email marketing tools. Supports FluentCRM and MailPoet.
+ * Version:     1.0.0
  * Author:      m4g4
  * License:     GPLv3 or later
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html

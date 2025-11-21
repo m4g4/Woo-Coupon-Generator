@@ -1,5 +1,18 @@
 <?php
 
+function ar_fluentcrm_coupon_gen_smartcode() {
+    global $AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_KEY, $AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_PREFIX;
+    return $AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_KEY.'.'.$AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_PREFIX;
+}
+
+function ar_is_fluentcrm_active() {
+    return is_plugin_active('fluent-crm/fluent-crm.php');
+}
+
+if (!class_exists('\FluentCrm\App\Api\Classes\Extender')) {
+    return;
+}
+
 use FluentCrm\App\Api\Classes\Extender;
 
 if (!defined('ABSPATH')) {
@@ -159,15 +172,6 @@ if (!class_exists('FluentCRM_Coupon_Generator')) {
             $campaign = isset($_REQUEST['campaign']) ? (object) $_REQUEST['campaign'] : null;
             return $campaign ? true : false;
         }
-    }
-
-    function ar_fluentcrm_coupon_gen_smartcode() {
-        global $AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_KEY, $AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_PREFIX;
-        return $AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_KEY.'.'.$AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_PREFIX;
-    }
-
-    function ar_is_fluentcrm_active() {
-        return is_plugin_active('fluent-crm/fluent-crm.php');
     }
 
     new FluentCRM_Coupon_Generator($AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_KEY, $AR_FLUENTCRM_COUPON_CUSTOM_SHORTCODE_PREFIX);
