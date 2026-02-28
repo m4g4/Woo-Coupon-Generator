@@ -137,7 +137,7 @@ if ( ! class_exists( 'WooCommerce_Coupon_Generator_Settings' ) ) {
             }
 
             $base_title = $base_coupon->post_title;
-            $content_prefix = 'Generated from ' . $base_title . ' for ';
+            $content_prefix = 'Generated from ' . $base_title;
 
             $coupon_ids = $wpdb->get_col(
                 $wpdb->prepare(
