@@ -25,5 +25,15 @@ if ( ! defined( 'ABSPATH' ) ) {
         New coupon prefix:<br />
 	    <input type="text" name="<?php echo $AR_ONE_TIME_COUPON_PREFIX; ?>" id="<?php echo $AR_ONE_TIME_COUPON_PREFIX; ?>" value="<?php echo $one_time_coupon_prefix; ?>"/><br /><br />
         Example: <span id="ar_coupon_example"></span><br />
+        <br />
+        <button
+            type="submit"
+            name="ar_delete_child_coupons"
+            value="1"
+            class="button button-secondary"
+            onclick="return confirm('Remove all generated child coupons for this template?');"
+        >
+            Remove all child coupons
+        </button>
     </div>
 </div>

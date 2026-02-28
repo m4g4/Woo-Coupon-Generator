@@ -15,6 +15,7 @@ if ( ! class_exists( 'WooCommerce_Coupon_Generator_Settings' ) ) {
             add_action('save_post', array($this, 'save_postdata'));
             add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
             add_action('admin_enqueue_scripts', [$this, 'enqueue_scripts']);
+            add_action('admin_notices', [$this, 'maybe_show_admin_notice']);
         }
 
         public function add_meta_boxes() {
@@ -87,8 +88,18 @@ if ( ! class_exists( 'WooCommerce_Coupon_Generator_Settings' ) ) {
             if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
                 return $post_id;
             }
+
+            if (!current_user_can('edit_post', $post_id)) {
+                return $post_id;
+            }
+
             $this->save_checkbox_value($post_id, $AR_ONE_TIME_COUPON_ENABLED);
             $this->save_input_value($post_id, $AR_ONE_TIME_COUPON_PREFIX);
+
+            if (isset($_POST['ar_delete_child_coupons']) && $_POST['ar_delete_child_coupons'] === '1') {
+                $deleted_count = $this->delete_child_coupons($post_id);
+                $this->set_admin_notice($deleted_count);
+            }
 
             return $post_id;
         }
@@ -105,10 +116,93 @@ if ( ! class_exists( 'WooCommerce_Coupon_Generator_Settings' ) ) {
         public function save_input_value($post_id, $id)
         {
             if (isset($_POST[$id])) {
-                update_post_meta($post_id, ar_key($id), $_POST[$id]);
+                update_post_meta($post_id, ar_key($id), sanitize_text_field($_POST[$id]));
             } else {
                 delete_post_meta($post_id, ar_key($id));
             }
+        }
+
+        private function delete_child_coupons($base_coupon_id)
+        {
+            global $wpdb, $AR_ONE_TIME_COUPON_PREFIX;
+
+            $base_coupon = get_post($base_coupon_id);
+            if (!$base_coupon || $base_coupon->post_type !== 'shop_coupon') {
+                return 0;
+            }
+
+            $prefix = get_post_meta($base_coupon_id, ar_key($AR_ONE_TIME_COUPON_PREFIX), true);
+            if (empty($prefix)) {
+                return 0;
+            }
+
+            $base_title = $base_coupon->post_title;
+            $content_prefix = 'Generated from ' . $base_title . ' for ';
+
+            $coupon_ids = $wpdb->get_col(
+                $wpdb->prepare(
+                    "SELECT ID
+                     FROM $wpdb->posts
+                     WHERE post_type = 'shop_coupon'
+                     AND post_status <> 'trash'
+                     AND ID <> %d
+                     AND post_title LIKE %s
+                     AND post_content LIKE %s",
+                    $base_coupon_id,
+                    $wpdb->esc_like($prefix) . '%',
+                    $wpdb->esc_like($content_prefix) . '%'
+                )
+            );
+
+            if (empty($coupon_ids)) {
+                return 0;
+            }
+
+            $deleted = 0;
+            foreach ($coupon_ids as $coupon_id) {
+                $result = wp_delete_post((int) $coupon_id, true);
+                if ($result) {
+                    $deleted++;
+                }
+            }
+
+            return $deleted;
+        }
+
+        private function set_admin_notice($deleted_count)
+        {
+            set_transient(
+                'ar_coupon_delete_notice_' . get_current_user_id(),
+                (int) $deleted_count,
+                120
+            );
+        }
+
+        public function maybe_show_admin_notice()
+        {
+            if (!is_admin()) {
+                return;
+            }
+
+            if (!function_exists('get_current_screen')) {
+                return;
+            }
+
+            $screen = get_current_screen();
+            if (!$screen || $screen->base !== 'post' || $screen->post_type !== 'shop_coupon') {
+                return;
+            }
+
+            $key = 'ar_coupon_delete_notice_' . get_current_user_id();
+            $deleted_count = get_transient($key);
+            if ($deleted_count === false) {
+                return;
+            }
+
+            delete_transient($key);
+            echo '<div class="notice notice-success is-dismissible"><p>';
+            echo esc_html(sprintf('Deleted %d generated child coupon(s).', (int) $deleted_count));
+            echo '</p></div>';
         }
     }
 }
